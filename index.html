@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IMPÉRIO DE MALVORN — As Sete Casas dos Pecados</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="header">
+  <div id="title">✦ IMPÉRIO DE MALVORN<span class="sub">REX PECCATORUM · AS SETE CASAS</span></div>
+  <div id="date-display">
+    <div id="world-date">ANO 1 • DIA 1 • MANHÃ</div>
+    <div id="real-time">tempo real: 00:00:00 | 1h = 1 dia</div>
+  </div>
+  <div id="controls">
+    <button class="ctrl-btn" id="btn-pause">❚❚ PAUSAR</button>
+    <button class="ctrl-btn" id="btn-speed">⚡ 2×</button>
+  </div>
+</div>
+
+<div id="main">
+  <div id="world-container">
+    
+    <div class="divine-panel" id="divine-panel">
+      <div style="font-family:'Cinzel', serif; color:var(--gold); margin-bottom:10px; font-size:0.7rem; text-align:center;">
+        ⚡ SELO DE MALVORN
+      </div>
+      <button class="god-btn" onclick="selectPower('bless')">✨ Conceder Favor Real</button>
+      <button class="god-btn" onclick="selectPower('smite')">☄️ Julgamento Imperial</button>
+      <button class="god-btn" onclick="selectPower('peace')">🕊️ Decreto de Paz</button>
+      <button class="god-btn" onclick="selectPower('spawn')">🏰 Fundar Nova Fortaleza</button>
+      <div id="active-power" style="margin-top:10px; font-size:0.55rem; color:var(--cyan); text-align:center;">
+        Nenhum poder selecionado
+      </div>
+    </div>
+
+    <canvas id="world-canvas"></canvas>
+    <div id="sky-overlay"></div>
+    <div id="weather-layer"></div>
+    <div id="season-badge">🌱 PRIMAVERA</div>
+    <div id="tooltip">
+      <div id="tooltip-name"></div>
+      <div id="tooltip-body"></div>
+    </div>
+    <div id="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:#1a6b3a"></div> Floresta</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#8b6914"></div> Deserto</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#0a4a8a"></div> Oceano</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#5a9a3a"></div> Planície</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#555"></div> Montanha</div>
+    </div>
+  </div>
+
+  <div id="sidebar">
+    <div class="panel">
+      <div class="panel-title">📊 Mundo</div>
+      <div class="stat-row">
+        <span class="stat-label">Temperatura Global</span>
+        <span class="stat-value" id="stat-temp">18°C</span>
+      </div>
+      <div class="stat-bar"><div class="stat-fill" id="bar-temp" style="width:50%;background:linear-gradient(90deg,#0af,#f80)"></div></div>
+      <div class="stat-row">
+        <span class="stat-label">Cobertura Florestal</span>
+        <span class="stat-value" id="stat-forest">68%</span>
+      </div>
+      <div class="stat-bar"><div class="stat-fill" id="bar-forest" style="width:68%;background:#0f8"></div></div>
+      <div class="stat-row">
+        <span class="stat-label">População do Império</span>
+        <span class="stat-value" id="stat-pop">0</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">Guerras Civis Ativas</span>
+        <span class="stat-value" id="stat-wars" style="color:#f35">0</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">Casas de Pé</span>
+        <span class="stat-value" id="stat-houses" style="color:var(--gold)">7/7</span>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">🏛 As Sete Casas</div>
+      <div id="civ-list"></div>
+    </div>
+
+    <div id="event-log">
+      <div class="log-title">📜 Crônicas</div>
+      <div id="log-entries"></div>
+    </div>
+  </div>
+</div>
+
+<div id="status-bar">
+  <div class="status-item">
+    <div class="status-dot" style="background:#0f8"></div>
+    <span id="sim-status">SIMULANDO</span>
+  </div>
+  <div class="status-item">
+    <span>CICLO: </span><span id="cycle-count">0</span>
+  </div>
+  <div class="status-item">
+    <span>CLIMA: </span><span id="weather-status">LIMPO</span>
+  </div>
+  <div class="status-item">
+    <span>ESTAÇÃO: </span><span id="season-status">PRIMAVERA</span>
+  </div>
+  <div class="status-item">
+    <span>EVENTOS: </span><span id="event-count">0</span>
+  </div>
+</div>
+
+<script src="js/script.js"></script>
+</body>
+</html>
