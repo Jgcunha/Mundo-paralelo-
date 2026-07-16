@@ -1,0 +1,446 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Share+Tech+Mono&display=swap');
+
+:root {
+  --void: #030508;
+  --deep: #060d14;
+  --ocean: #0a1628;
+  --land: #1a3a2a;
+  --forest: #0d5c2e;
+  --desert: #8b6914;
+  --snow: #c8dde8;
+  --gold: #d4a843;
+  --amber: #e8830a;
+  --cyan: #00e5ff;
+  --green: #00ff88;
+  --red: #ff3355;
+  --purple: #8844ff;
+  --text: #c8dce8;
+  --dim: #4a6a7a;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--void);
+  color: var(--text);
+  font-family: 'Share Tech Mono', monospace;
+  overflow: hidden;
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+}
+
+/* HEADER */
+#header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 20px;
+  background: linear-gradient(180deg, #0a0f18 0%, transparent 100%);
+  border-bottom: 1px solid rgba(0,229,255,0.15);
+  z-index: 100;
+  flex-shrink: 0;
+}
+
+#title {
+  font-family: 'Cinzel', serif;
+  font-size: 1.3rem;
+  font-weight: 900;
+  letter-spacing: 0.3em;
+  color: var(--gold);
+  text-shadow: 0 0 20px rgba(212,168,67,0.5);
+  line-height: 1.1;
+}
+
+#title .sub {
+  display: block;
+  font-size: 0.5rem;
+  letter-spacing: 0.5em;
+  color: var(--dim);
+  font-family: 'Share Tech Mono', monospace;
+  font-weight: 400;
+  margin-top: 2px;
+}
+
+#date-display {
+  text-align: center;
+}
+
+#world-date {
+  font-size: 0.75rem;
+  color: var(--cyan);
+  letter-spacing: 0.2em;
+}
+
+#real-time {
+  font-size: 0.6rem;
+  color: var(--dim);
+  margin-top: 2px;
+}
+
+#controls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.ctrl-btn {
+  background: rgba(0,229,255,0.08);
+  border: 1px solid rgba(0,229,255,0.3);
+  color: var(--cyan);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.65rem;
+  padding: 4px 10px;
+  cursor: pointer;
+  letter-spacing: 0.1em;
+  transition: all 0.2s;
+}
+
+.ctrl-btn:hover {
+  background: rgba(0,229,255,0.2);
+  box-shadow: 0 0 10px rgba(0,229,255,0.3);
+}
+
+.ctrl-btn.active {
+  background: rgba(0,229,255,0.25);
+  border-color: var(--cyan);
+  box-shadow: 0 0 12px rgba(0,229,255,0.4);
+}
+
+/* MAIN AREA */
+#main {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* WORLD CANVAS */
+#world-container {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+#world-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  transform-origin: center;
+}
+
+/* SKY OVERLAY */
+#sky-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  transition: background 3s ease;
+}
+
+/* WEATHER LAYER */
+#weather-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* SIDEBAR */
+#sidebar {
+  width: 260px;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(180deg, #060d14 0%, #030508 100%);
+  border-left: 1px solid rgba(0,229,255,0.1);
+  overflow-y: auto;
+  flex-shrink: 0;
+}
+
+.panel {
+  border-bottom: 1px solid rgba(0,229,255,0.08);
+  padding: 12px 14px;
+}
+
+.panel-title {
+  font-family: 'Cinzel', serif;
+  font-size: 0.6rem;
+  letter-spacing: 0.3em;
+  color: var(--gold);
+  margin-bottom: 10px;
+  text-transform: uppercase;
+}
+
+/* STATS */
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.stat-label {
+  font-size: 0.6rem;
+  color: var(--dim);
+  letter-spacing: 0.05em;
+}
+
+.stat-value {
+  font-size: 0.7rem;
+  color: var(--cyan);
+}
+
+.stat-bar {
+  height: 3px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 2px;
+  margin-bottom: 8px;
+  overflow: hidden;
+}
+
+.stat-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 1s ease;
+}
+
+/* CIVILIZATIONS */
+.civ-item {
+  margin-bottom: 8px;
+  padding: 6px 8px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-left: 3px solid;
+}
+
+.civ-name {
+  font-size: 0.65rem;
+  letter-spacing: 0.05em;
+  margin-bottom: 3px;
+}
+
+.civ-pop {
+  font-size: 0.55rem;
+  color: var(--dim);
+}
+
+.civ-era {
+  font-size: 0.5rem;
+  opacity: 0.6;
+  margin-top: 2px;
+}
+
+/* LOG */
+#event-log {
+  flex: 1;
+  padding: 10px 14px;
+  overflow-y: auto;
+}
+
+.log-title {
+  font-family: 'Cinzel', serif;
+  font-size: 0.6rem;
+  letter-spacing: 0.3em;
+  color: var(--gold);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  position: sticky;
+  top: 0;
+  background: #030508;
+  padding-bottom: 4px;
+}
+
+.log-entry {
+  font-size: 0.58rem;
+  color: var(--dim);
+  margin-bottom: 5px;
+  padding-left: 8px;
+  border-left: 2px solid rgba(0,229,255,0.2);
+  line-height: 1.4;
+  animation: fadeIn 0.5s ease;
+}
+
+.log-entry.important { color: var(--text); border-left-color: var(--gold); }
+.log-entry.war { border-left-color: var(--red); }
+.log-entry.discovery { border-left-color: var(--cyan); }
+.log-entry.nature { border-left-color: var(--green); }
+.log-entry.disaster { border-left-color: var(--amber); }
+
+.log-day {
+  font-size: 0.5rem;
+  color: rgba(0,229,255,0.4);
+  margin-bottom: 1px;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateX(-5px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* BOTTOM STATUS */
+#status-bar {
+  display: flex;
+  gap: 20px;
+  padding: 5px 20px;
+  background: rgba(6,13,20,0.9);
+  border-top: 1px solid rgba(0,229,255,0.1);
+  font-size: 0.55rem;
+  color: var(--dim);
+  flex-shrink: 0;
+}
+
+.status-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.status-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+/* RAIN / SNOW */
+.rain-drop {
+  position: absolute;
+  width: 1px;
+  background: linear-gradient(180deg, transparent, rgba(150,200,255,0.4));
+  animation: rain linear infinite;
+}
+
+@keyframes rain {
+  from { transform: translateY(-20px); }
+  to { transform: translateY(110vh); }
+}
+
+.snow-flake {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background: rgba(220,240,255,0.7);
+  border-radius: 50%;
+  animation: snowfall linear infinite;
+}
+
+@keyframes snowfall {
+  from { transform: translateY(-10px) translateX(0); }
+  to { transform: translateY(110vh) translateX(20px); }
+}
+
+/* TOOLTIP */
+#tooltip {
+  position: absolute;
+  background: rgba(6,13,20,0.95);
+  border: 1px solid rgba(0,229,255,0.3);
+  padding: 8px 12px;
+  font-size: 0.6rem;
+  pointer-events: none;
+  display: none;
+  z-index: 200;
+  max-width: 180px;
+}
+
+#tooltip-name {
+  font-family: 'Cinzel', serif;
+  color: var(--gold);
+  margin-bottom: 4px;
+  font-size: 0.65rem;
+}
+
+/* LEGEND */
+#legend {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  pointer-events: none;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.5rem;
+  color: var(--dim);
+}
+
+.legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+/* SEASON INDICATOR */
+#season-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  font-family: 'Cinzel', serif;
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  color: var(--gold);
+  background: rgba(6,13,20,0.7);
+  padding: 4px 10px;
+  border: 1px solid rgba(212,168,67,0.3);
+  pointer-events: none;
+}
+
+body::before{
+  content:'';position:fixed;inset:0;
+  background:
+  radial-gradient(circle at 20% 20%, rgba(0,150,255,.15), transparent 30%),
+  radial-gradient(circle at 80% 60%, rgba(180,0,255,.12), transparent 35%);
+  pointer-events:none;
+}
+
+#world-container{
+  background:
+  radial-gradient(circle at center, rgba(0,120,255,.12), transparent 45%),
+  #000;
+}
+
+#world-canvas{
+  filter: drop-shadow(0 0 20px rgba(0,229,255,.25));
+}
+
+.divine-panel{
+  position:absolute;top:10px;right:10px;z-index:999;
+  background:rgba(0,0,0,.65);backdrop-filter:blur(8px);
+  padding:10px;border:1px solid rgba(255,255,255,.15);
+  width: 200px;
+}
+
+/* BOTÕES DIVINOS */
+.god-btn {
+  display: block;
+  width: 100%;
+  background: rgba(0,229,255,0.05);
+  border: 1px solid rgba(0,229,255,0.2);
+  color: var(--text);
+  padding: 6px 10px;
+  margin-bottom: 5px;
+  cursor: pointer;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.6rem;
+  text-align: left;
+  transition: all 0.2s;
+}
+
+.god-btn:hover {
+  background: rgba(0,229,255,0.2);
+  box-shadow: 0 0 8px rgba(0,229,255,0.3);
+}
+
+.god-btn.active {
+  background: rgba(212,168,67,0.3);
+  border-color: var(--gold);
+  color: var(--gold);
+}
