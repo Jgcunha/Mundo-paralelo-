@@ -39,8 +39,9 @@ const WEATHER_NAMES = {
 
 // ==================== CLASSES ====================
 class Civilization {
-  constructor(name, x, y, color) {
+  constructor(name, sin, x, y, color) {
     this.name = name;
+    this.sin = sin;
     this.x = x;
     this.y = y;
     this.color = color;
@@ -85,15 +86,15 @@ class Civilization {
   }
 }
 
-// ==================== CIVILIZAÇÕES ====================
+// ==================== CIVILIZAÇÕES - AS SETE CASAS DOS PECADOS ====================
 const civilizations = [
-  new Civilization('Casa Targaryen', 150, 150, '#d4a843'),
-  new Civilization('Casa Stark', 400, 200, '#4a8caf'),
-  new Civilization('Casa Lannister', 250, 400, '#c41e3a'),
-  new Civilization('Casa Baratheon', 600, 300, '#ffeb3b'),
-  new Civilization('Casa Tyrell', 500, 500, '#52b788'),
-  new Civilization('Casa Martell', 750, 450, '#ff8c42'),
-  new Civilization('Casa Greyjoy', 200, 650, '#2c3e50'),
+  new Civilization('Áurea', 'Soberba', 150, 150, '#d4a843'),
+  new Civilization('Fernvult', 'Ira', 400, 200, '#c41e3a'),
+  new Civilization('Ouroleth', 'Avareza', 250, 400, '#ffd700'),
+  new Civilization('Vessarine', 'Inveja', 600, 300, '#00ff88'),
+  new Civilization('Belmoire', 'Luxúria', 500, 500, '#ff69b4'),
+  new Civilization('Thorngrain', 'Gula', 750, 450, '#ff8c42'),
+  new Civilization('Somneth', 'Preguiça', 200, 650, '#4a7c8a'),
 ];
 
 // ==================== CANVAS E CONTEXTO ====================
@@ -203,10 +204,10 @@ function update() {
       
       if (civ2.population < civ1.population) {
         civ2.population *= 0.8;
-        addEvent(`⚔️ ${civ1.name} conquista ${civ2.name}!`, 'war');
+        addEvent(`⚔️ ${civ1.name} (${civ1.sin}) conquista ${civ2.name}!`, 'war');
       } else {
         civ1.population *= 0.8;
-        addEvent(`⚔️ ${civ2.name} resiste a ${civ1.name}!`, 'war');
+        addEvent(`⚔️ ${civ2.name} (${civ2.sin}) resiste a ${civ1.name}!`, 'war');
       }
     }
   }
@@ -313,7 +314,8 @@ function updateUI() {
       <div class="civ-item" style="border-left-color: ${civ.color}">
         <div class="civ-name" style="color: ${civ.color}">${civ.name}</div>
         <div class="civ-pop">👥 ${Math.round(civ.population).toLocaleString()}</div>
-        <div class="civ-era">Era ${civ.era} ${civ.alive ? '✓' : '✗'}</div>
+        <div class="civ-era">⚜️ ${civ.sin} | Era ${civ.era}</div>
+        <div style="font-size: 0.5rem; color: var(--dim); margin-top: 2px;">${civ.alive ? '✓ Ativa' : '✗ Extinta'}</div>
       </div>
     `).join('');
   }
@@ -361,4 +363,5 @@ setInterval(gameLoop, CONFIG.UPDATE_INTERVAL);
 
 // Inicializar
 render();
-addEvent('🌍 O Império de Malvorn nasceu...', 'important');
+addEvent('🌍 O Império de Malvorn nasceu sob o Selo dos Sete Pecados...', 'important');
+addEvent('🏛️ Sete Casas despertam: Áurea, Fernvult, Ouroleth, Vessarine, Belmoire, Thorngrain e Somneth', 'important');
