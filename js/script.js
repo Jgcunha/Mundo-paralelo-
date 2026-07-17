@@ -19,6 +19,8 @@ let gameState = {
   weather: 'clear',
   temperature: 18,
   events: [],
+  selectedCiv: null,
+  activePower: null,
 };
 
 const SEASONS = ['PRIMAVERA', 'VERÃO', 'OUTONO', 'INVERNO'];
@@ -50,10 +52,11 @@ class Civilization {
     this.territories = [];
     this.alive = true;
     this.wars = 0;
+    this.discoveries = 0;
+    this.alliances = [];
   }
 
   update() {
-    // Crescimento populacional
     if (gameState.isPaused) return;
     
     const baseGrowth = 1 + (Math.random() * 0.1);
@@ -63,12 +66,10 @@ class Civilization {
     this.population *= baseGrowth * seasonModifier * warModifier;
     this.population = Math.max(0, this.population);
 
-    // Progresso de era
     if (this.population > 5000 * this.era) {
       this.era++;
     }
 
-    // Morte da civilização
     if (this.population < 100) {
       this.alive = false;
     }
@@ -111,21 +112,17 @@ window.addEventListener('resize', resizeCanvas);
 
 // ==================== RENDER ====================
 function render() {
-  // Limpar canvas
   ctx.fillStyle = '#030508';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  // Desenhar mapa
   drawMap();
 
-  // Desenhar civilizações
   civilizations.forEach(civ => {
     if (civ.alive) {
       drawCivilization(civ);
     }
   });
 
-  // Atualizar UI
   updateUI();
 }
 
@@ -133,26 +130,31 @@ function drawMap() {
   ctx.fillStyle = '#0a4a8a';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  // Terras
   ctx.fillStyle = '#1a3a2a';
   ctx.fillRect(0, 0, canvas.width, canvas.height * 0.7);
 }
 
 function drawCivilization(civ) {
-  // Círculo da civilização
   const scaleX = canvas.width / 1200;
   const scaleY = canvas.height / 800;
 
   const size = Math.sqrt(civ.population) / 15;
 
   ctx.fillStyle = civ.color;
-  ctx.globalAlpha = 0.7;
+  ctx.globalAlpha = gameState.selectedCiv === civ ? 1 : 0.7;
   ctx.beginPath();
   ctx.arc(civ.x * scaleX, civ.y * scaleY, size, 0, Math.PI * 2);
   ctx.fill();
+
+  // Borda se selecionada
+  if (gameState.selectedCiv === civ) {
+    ctx.strokeStyle = civ.color;
+    ctx.lineWidth = 3;
+    ctx.stroke();
+  }
+
   ctx.globalAlpha = 1;
 
-  // Nome
   ctx.fillStyle = civ.color;
   ctx.font = 'bold 12px Arial';
   ctx.textAlign = 'center';
@@ -163,7 +165,6 @@ function drawCivilization(civ) {
 function update() {
   if (gameState.isPaused) return;
 
-  // Avançar tempo
   gameState.hour += gameState.speed;
 
   if (gameState.hour >= 24) {
@@ -175,25 +176,20 @@ function update() {
       gameState.year += 1;
     }
 
-    // Atualizar estação
     gameState.season = Math.floor((gameState.day - 1) / 91) % 4;
 
-    // Clima aleatório
     if (Math.random() < 0.3) {
       gameState.weather = WEATHERS[Math.floor(Math.random() * WEATHERS.length)];
     } else {
       gameState.weather = 'clear';
     }
 
-    // Temperatura
     const seasonTemp = [15, 28, 18, 5][gameState.season];
     gameState.temperature = seasonTemp + (Math.random() - 0.5) * 10;
   }
 
-  // Atualizar civilizações
   civilizations.forEach(civ => civ.update());
 
-  // Guerras aleatórias
   if (Math.random() < 0.02) {
     const civ1 = civilizations[Math.floor(Math.random() * civilizations.length)];
     const civ2 = civilizations[Math.floor(Math.random() * civilizations.length)];
@@ -230,7 +226,6 @@ function addEvent(text, type = 'normal') {
     gameState.events.pop();
   }
 
-  // Adicionar ao log visual
   const logEntries = document.getElementById('log-entries');
   if (logEntries) {
     const entry = document.createElement('div');
@@ -246,19 +241,16 @@ function addEvent(text, type = 'normal') {
 
 // ==================== UI ====================
 function updateUI() {
-  // Data
   const worldDateEl = document.getElementById('world-date');
   if (worldDateEl) {
-    worldDateEl.textContent = `ANO ${gameState.year} • DIA ${gameState.day} • ${gameState.hour}:00`;
+    worldDateEl.textContent = `ANO ${gameState.year} • DIA ${gameState.day} • ${Math.floor(gameState.hour)}:00`;
   }
 
-  // Hora real
   const realTimeEl = document.getElementById('real-time');
   if (realTimeEl) {
     realTimeEl.textContent = `tempo real: ${String(Math.floor(gameState.hour)).padStart(2, '0')}:00:00 | 1h = 1 dia`;
   }
 
-  // Estação
   const seasonBadge = document.getElementById('season-badge');
   if (seasonBadge) {
     const seasonEmojis = ['🌱', '☀️', '🍂', '❄️'];
@@ -270,19 +262,16 @@ function updateUI() {
     seasonStatus.textContent = SEASONS[gameState.season];
   }
 
-  // Clima
   const weatherStatus = document.getElementById('weather-status');
   if (weatherStatus) {
     weatherStatus.textContent = WEATHER_NAMES[gameState.weather] || 'DESCONHECIDO';
   }
 
-  // Temperatura
   const tempEl = document.getElementById('stat-temp');
   if (tempEl) {
     tempEl.textContent = Math.round(gameState.temperature) + '°C';
   }
 
-  // Estatísticas gerais
   const totalPop = civilizations.reduce((sum, c) => sum + (c.alive ? c.population : 0), 0);
   const popEl = document.getElementById('stat-pop');
   if (popEl) {
@@ -301,23 +290,89 @@ function updateUI() {
     housesEl.textContent = `${alive}/7`;
   }
 
-  // Cycle
   const cycleEl = document.getElementById('cycle-count');
   if (cycleEl) {
     cycleEl.textContent = gameState.cycle;
   }
 
-  // Lista de civilizações
   const civList = document.getElementById('civ-list');
   if (civList) {
-    civList.innerHTML = civilizations.map(civ => `
-      <div class="civ-item" style="border-left-color: ${civ.color}">
+    civList.innerHTML = civilizations.map((civ, idx) => `
+      <div class="civ-item ${gameState.selectedCiv === civ ? 'selected' : ''}" 
+           style="border-left-color: ${civ.color}" 
+           onclick="selectCivilization(${idx})">
         <div class="civ-name" style="color: ${civ.color}">${civ.name}</div>
         <div class="civ-pop">👥 ${Math.round(civ.population).toLocaleString()}</div>
         <div class="civ-era">⚜️ ${civ.sin} | Era ${civ.era}</div>
         <div style="font-size: 0.5rem; color: var(--dim); margin-top: 2px;">${civ.alive ? '✓ Ativa' : '✗ Extinta'}</div>
       </div>
     `).join('');
+  }
+}
+
+// ==================== SELEÇÃO DE CIVILIZAÇÃO ====================
+function selectCivilization(idx) {
+  gameState.selectedCiv = civilizations[idx];
+  showCivDetails(civilizations[idx]);
+}
+
+function showCivDetails(civ) {
+  const modal = document.getElementById('civ-modal');
+  if (!modal) return;
+
+  document.getElementById('modal-civ-name').textContent = civ.name;
+  document.getElementById('modal-civ-sin').textContent = `Pecado: ${civ.sin}`;
+  document.getElementById('modal-civ-pop').textContent = `População: ${Math.round(civ.population).toLocaleString()}`;
+  document.getElementById('modal-civ-era').textContent = `Era: ${civ.era}`;
+  document.getElementById('modal-civ-wars').textContent = `Guerras: ${civ.wars}`;
+  document.getElementById('modal-civ-status').textContent = civ.alive ? '✓ Ativa' : '✗ Extinta';
+  document.getElementById('modal-civ-status').style.color = civ.alive ? '#00ff88' : '#ff3355';
+
+  // Atualizar cores dos botões de poder
+  document.querySelectorAll('.modal-god-btn').forEach(btn => {
+    btn.style.borderColor = civ.color;
+    btn.style.color = civ.color;
+  });
+
+  modal.style.display = 'flex';
+}
+
+function closeCivModal() {
+  const modal = document.getElementById('civ-modal');
+  if (modal) modal.style.display = 'none';
+}
+
+// ==================== PODERES IMPERIAIS ====================
+function usePower(power) {
+  if (!gameState.selectedCiv) {
+    alert('Selecione uma casa primeiro!');
+    return;
+  }
+
+  const civ = gameState.selectedCiv;
+
+  const powers = {
+    'bless': () => {
+      civ.population *= 1.3;
+      addEvent(`✨ ${civ.name} recebe o Favor Real do Imperador!`, 'discovery');
+    },
+    'smite': () => {
+      civ.population *= 0.5;
+      addEvent(`☄️ ${civ.name} sofre o Julgamento Imperial!`, 'disaster');
+    },
+    'peace': () => {
+      civ.wars = 0;
+      addEvent(`🕊️ ${civ.name} entra em Decreto de Paz!`, 'discovery');
+    },
+    'spawn': () => {
+      civ.population += 2000;
+      addEvent(`🏰 Nova Fortaleza fundada em ${civ.name}!`, 'discovery');
+    },
+  };
+
+  if (powers[power]) {
+    powers[power]();
+    gameState.activePower = null;
   }
 }
 
@@ -333,25 +388,15 @@ document.getElementById('btn-speed')?.addEventListener('click', function() {
   this.textContent = `⚡ ${gameState.speed}×`;
 });
 
-function selectPower(power) {
-  const activePower = document.getElementById('active-power');
-  const buttons = document.querySelectorAll('.god-btn');
-  
-  buttons.forEach(btn => btn.classList.remove('active'));
-  
-  const powers = {
-    'bless': '✨ Favor Real ativado',
-    'smite': '☄️ Julgamento Imperial ativado',
-    'peace': '🕊️ Decreto de Paz ativado',
-    'spawn': '🏰 Nova Fortaleza fundada',
-  };
-  
-  if (activePower) {
-    activePower.textContent = powers[power] || 'Poder ativado';
+// ==================== MODAL CLOSE ====================
+document.getElementById('close-modal')?.addEventListener('click', closeCivModal);
+
+window.addEventListener('click', (e) => {
+  const modal = document.getElementById('civ-modal');
+  if (e.target === modal) {
+    closeCivModal();
   }
-  
-  event.target.classList.add('active');
-}
+});
 
 // ==================== GAME LOOP ====================
 function gameLoop() {
